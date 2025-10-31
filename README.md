@@ -37,7 +37,7 @@ Despliegue completo sobre infraestructura **cloud híbrida**: frontend alojado e
 
 ```mermaid
 graph LR
-  A([Frontend - NextJS (Firebase Hosting)]) --> B[[API - NodeJS (Oracle Cloud VM)]]
+  A([Frontend - NextJS - Firebase Hosting]) --> B[[API - NodeJS - Oracle Cloud VM]]
   B --> C[(Oracle Database - Oracle Cloud)]
 ```
 
