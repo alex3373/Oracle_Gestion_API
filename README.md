@@ -31,11 +31,11 @@ Despliegue completo sobre infraestructura **cloud (VM Ubuntu + Oracle Database)*
 ---
 
 ## 🧱 Arquitectura General
+
 ```mermaid
 graph LR
-A[Frontend (Next.js)] --> B[API Node.js]
-B --> C[(Oracle Database)]
----
+  A[Frontend (Next.js)] --> B[API Node.js]
+  B --> C[(Oracle Database)]
 
 
 ```
