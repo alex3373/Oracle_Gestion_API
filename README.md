@@ -1,6 +1,6 @@
-# 🧩 Gestión de Ventas – Oracle Cloud
+# Gestión de Ventas – Oracle Cloud
 
-Backend principal del sistema de **gestión de ventas**, con conexión directa a una base de datos **Oracle PL/SQL alojada en Oracle Cloud**.  
+Backend principal del sistema de **gestión de ventas y vendedores**, con conexión directa a una base de datos **Oracle PL/SQL alojada en Oracle Cloud**.  
 Despliegue completo sobre infraestructura **cloud (VM Ubuntu + Oracle Database)**, gestionado con **PM2** y **Cloudflare Tunnel**.
 
 ---
