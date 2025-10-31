@@ -37,10 +37,7 @@ A[Frontend (Next.js)] --> B[API Node.js]
 B --> C[(Oracle Database)]
 ---
 
-## 🔗 Repositorios Relacionados
 
-- [Frontend (Next.js)](https://github.com/alex3373/frontend_ventas)
-- [Base de datos PL/SQL](https://github.com/alex3373/BBDD_SQL-PLSQL)
 ```
 ---
 
