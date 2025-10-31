@@ -31,7 +31,9 @@ Despliegue completo sobre infraestructura **cloud híbrida**: frontend alojado e
 
 ---
 
-## Arquitectura General
+---
+
+## 🧱 Arquitectura General
 
 ```mermaid
 graph LR
@@ -39,21 +41,14 @@ graph LR
   B --> C[(Oracle Database - Oracle Cloud)]
 ```
 
-<p style="font-size: 0.9em; color: #555; margin-top: 8px;">
-Infraestructura desplegada en entornos cloud combinados: <strong>frontend alojado en Firebase Hosting</strong> y <strong>backend + base de datos en Oracle Cloud</strong> (VM Ubuntu 22.04 + Oracle Database 21c), gestionados con PM2 y Cloudflare Tunnel.
-</p>
-
 ---
 
-## Autor
+## 👨‍💻 Autor
 
 **Alexis Córdova Díaz**  
 Analista Programador | Desarrollador Full Stack  
 📧 alexisandres311@gmail.com  
 🌐 [linkedin.com/in/alexis-andres-cordova](https://linkedin.com/in/alexis-andres-cordova)
-
----
-
 
 ---
 
