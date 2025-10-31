@@ -10,6 +10,14 @@ Despliegue completo sobre infraestructura **cloud (VM Ubuntu + Oracle Database)*
 🔸 **Frontend en línea:** [oracle-dashboard.0003333.xyz](https://oracle-dashboard.0003333.xyz)  
 🔸 **API Backend:** [api.0003333.xyz](https://api.0003333.xyz)
 
+---
+
+## 🔗 Repositorios Relacionados
+
+- [Frontend (Next.js)](https://github.com/alex3373/frontend_ventas)
+- [Base de datos PL/SQL](https://github.com/alex3373/BBDD_SQL-PLSQL)
+---
+
 ## ⚙️ Tecnologías Utilizadas
 
 | Capa | Tecnología |
@@ -23,14 +31,17 @@ Despliegue completo sobre infraestructura **cloud (VM Ubuntu + Oracle Database)*
 ---
 
 ## 🧱 Arquitectura General
-
+```mermaid
+graph LR
+A[Frontend (Next.js)] --> B[API Node.js]
+B --> C[(Oracle Database)]
 ---
 
 ## 🔗 Repositorios Relacionados
 
 - [Frontend (Next.js)](https://github.com/alex3373/frontend_ventas)
 - [Base de datos PL/SQL](https://github.com/alex3373/BBDD_SQL-PLSQL)
-
+```
 ---
 
 ## 👨‍💻 Autor
