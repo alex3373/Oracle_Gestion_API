@@ -33,12 +33,14 @@ Despliegue completo sobre infraestructura **cloud (VM Ubuntu + Oracle Database)*
 
 ---
 
+---
+
 ## 🧱 Arquitectura General
 
 ```mermaid
 graph LR
-  A([Frontend - NextJS]) --> B[[API - NodeJS]]
-  B --> C[(Oracle Database)]
+  A([Frontend - NextJS (Firebase Hosting)]) --> B[[API - NodeJS (Oracle Cloud VM)]]
+  B --> C[(Oracle Database - Oracle Cloud)]
 ```
 
 ---
@@ -51,4 +53,5 @@ Analista Programador | Desarrollador Full Stack
 🌐 [linkedin.com/in/alexis-andres-cordova](https://linkedin.com/in/alexis-andres-cordova)
 
 ---
+
 
