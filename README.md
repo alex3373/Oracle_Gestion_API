@@ -14,7 +14,7 @@ Despliegue completo sobre infraestructura **cloud híbrida**: frontend alojado e
 
 ## Repositorios Relacionados
 
-- [Frontend (Next.js)](https://github.com/alex3373/frontend_ventas)
+- [Frontend (Next.js)](https://github.com/alex3373/Frontend_Gestion_BBDD)
 - [Base de datos PL/SQL](https://github.com/alex3373/BBDD_SQL-PLSQL)
 
 ---
