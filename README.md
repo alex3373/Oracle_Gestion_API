@@ -29,15 +29,17 @@ Despliegue completo sobre infraestructura **cloud (VM Ubuntu + Oracle Database)*
 | Frontend | Next.js (demo conectado al backend) |
 
 ---
+---
+
+---
 
 ## 🧱 Arquitectura General
 
 ```mermaid
 graph LR
-  A[Frontend (Next.js)] --> B[API Node.js]
+  A([Frontend - NextJS]) --> B[[API - NodeJS]]
   B --> C[(Oracle Database)]
-
-
+```
 
 ---
 
@@ -46,6 +48,7 @@ graph LR
 **Alexis Córdova Díaz**  
 Analista Programador | Desarrollador Full Stack  
 📧 alexisandres311@gmail.com  
-🌐 [linkedin.com/in/alexis-andrés-córdova](https://linkedin.com/in/alexis-andres-cordova)
+🌐 [linkedin.com/in/alexis-andres-cordova](https://linkedin.com/in/alexis-andres-cordova)
 
 ---
+
