@@ -39,16 +39,19 @@ jobs:
             routes \
             db
 
-      - name: Configure SSH
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.ORACLE_SSH_KEY }}
+         - name: Configure SSH
+           env:
+          SSH_PRIVATE_KEY_B64: ${{ secrets.ORACLE_SSH_KEY_B64 }}
           ORACLE_HOST: ${{ secrets.ORACLE_HOST }}
         run: |
           mkdir -p ~/.ssh
           chmod 700 ~/.ssh
 
-          printf "%s\n" "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/oracle.key
+          printf "%s" "$SSH_PRIVATE_KEY_B64" | base64 --decode > ~/.ssh/oracle.key
           chmod 600 ~/.ssh/oracle.key
+
+          ssh-keygen -y -f ~/.ssh/oracle.key > /dev/null
+          echo "SSH private key loaded successfully"
 
           ssh-keyscan -H "$ORACLE_HOST" >> ~/.ssh/known_hosts
           chmod 600 ~/.ssh/known_hosts
