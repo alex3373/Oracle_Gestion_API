@@ -265,45 +265,75 @@ router.get('/dashboard', async (req, res) => {
       SELECT
         rutvendedor,
         nombre,
-        SUM(boletas_documentos) AS boletas_documentos,
-        SUM(boletas_total) AS boletas_total,
-        SUM(facturas_documentos) AS facturas_documentos,
-        SUM(facturas_total) AS facturas_total
+
+        SUM(
+          CASE
+            WHEN tipo = 'BOLETA'
+            THEN 1
+            ELSE 0
+          END
+        ) AS boletas_documentos,
+
+        SUM(
+          CASE
+            WHEN tipo = 'BOLETA'
+            THEN total
+            ELSE 0
+          END
+        ) AS boletas_total,
+
+        SUM(
+          CASE
+            WHEN tipo = 'FACTURA'
+            THEN 1
+            ELSE 0
+          END
+        ) AS facturas_documentos,
+
+        SUM(
+          CASE
+            WHEN tipo = 'FACTURA'
+            THEN total
+            ELSE 0
+          END
+        ) AS facturas_total,
+
+        SUM(total) AS total_documentado
+
       FROM (
         SELECT
+          'BOLETA' AS tipo,
           b.rutvendedor,
           v.nombre,
-          COUNT(*) AS boletas_documentos,
-          NVL(SUM(b.total), 0) AS boletas_total,
-          0 AS facturas_documentos,
-          0 AS facturas_total
+          b.total
         FROM boleta b
+
         LEFT JOIN vendedor v
           ON v.rutvendedor = b.rutvendedor
+
         WHERE EXTRACT(YEAR FROM b.fecha) = :anio
-        GROUP BY b.rutvendedor, v.nombre
 
         UNION ALL
 
         SELECT
+          'FACTURA' AS tipo,
           f.rutvendedor,
           v.nombre,
-          0 AS boletas_documentos,
-          0 AS boletas_total,
-          COUNT(*) AS facturas_documentos,
-          NVL(SUM(f.total), 0) AS facturas_total
+          f.total
         FROM factura f
+
         LEFT JOIN vendedor v
           ON v.rutvendedor = f.rutvendedor
+
         WHERE EXTRACT(YEAR FROM f.fecha) = :anio
-        GROUP BY f.rutvendedor, v.nombre
       )
-      GROUP BY rutvendedor, nombre
+
+      GROUP BY
+        rutvendedor,
+        nombre
+
       ORDER BY
-        (
-          SUM(boletas_total) +
-          SUM(facturas_total)
-        ) DESC
+        total_documentado DESC
       `,
       { anio }
     );
