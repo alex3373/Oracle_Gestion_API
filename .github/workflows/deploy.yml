@@ -47,7 +47,7 @@ jobs:
           mkdir -p ~/.ssh
           chmod 700 ~/.ssh
 
-          printf "%s\n" "$SSH_PRIVATE_KEY" > ~/.ssh/oracle.key
+          printf "%s\n" "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/oracle.key
           chmod 600 ~/.ssh/oracle.key
 
           ssh-keyscan -H "$ORACLE_HOST" >> ~/.ssh/known_hosts
