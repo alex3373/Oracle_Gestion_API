@@ -1,0 +1,74 @@
+name: Deploy Oracle API
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Validate JavaScript
+        run: |
+          node --check server.js
+          node --check app.js
+          node --check routes/oracleRoutes.js
+          node --check db/connection.js
+
+      - name: Create deployment package
+        run: |
+          tar -czf oracle-api-deploy.tar.gz \
+            app.js \
+            server.js \
+            package.json \
+            package-lock.json \
+            routes \
+            db
+
+      - name: Configure SSH
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.ORACLE_SSH_KEY }}
+          ORACLE_HOST: ${{ secrets.ORACLE_HOST }}
+        run: |
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+
+          printf "%s\n" "$SSH_PRIVATE_KEY" > ~/.ssh/oracle.key
+          chmod 600 ~/.ssh/oracle.key
+
+          ssh-keyscan -H "$ORACLE_HOST" >> ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/known_hosts
+
+      - name: Upload deployment
+        env:
+          ORACLE_HOST: ${{ secrets.ORACLE_HOST }}
+          ORACLE_USER: ${{ secrets.ORACLE_USER }}
+        run: |
+          scp \
+            -i ~/.ssh/oracle.key \
+            oracle-api-deploy.tar.gz \
+            "$ORACLE_USER@$ORACLE_HOST:/tmp/oracle-api-deploy.tar.gz"
+
+      - name: Deploy to Oracle Cloud
+        env:
+          ORACLE_HOST: ${{ secrets.ORACLE_HOST }}
+          ORACLE_USER: ${{ secrets.ORACLE_USER }}
+        run: |
+          ssh \
+            -i ~/.ssh/oracle.key \
+            "$ORACLE_USER@$ORACLE_HOST" \
+            "deploy-oracle-api"
