@@ -1,92 +1,206 @@
 import express from 'express';
-import cors from 'cors';
-import oracleRouter from './routes/oracleRoutes.js';
+import oracleRoutes from './routes/oracleRoutes.js';
+import { getConnection } from './db/connection.js';
 
 const app = express();
 
-// =======================
-// CORS AVANZADO (PROD)
-// =======================
+
+/* ============================================================
+   CONFIGURACIÓN GENERAL
+   ============================================================ */
+
+app.disable('x-powered-by');
+
 app.use(
-  cors({
-    origin: (origin, callback) => {
-      // Permitir requests sin origin (Postman, curl, server-to-server)
-      if (!origin) return callback(null, true);
-
-      const allowedOrigins = [
-        'http://localhost:3000',
-        'https://oracle.tramasys.cl',
-        'https://oracle-dashboard.0003333.xyz',
-        'https://ventasgestion331.firebaseapp.com',
-      ];
-
-      // Regex para subdominios permitidos
-      const allowedPatterns = [
-        /\.0003333\.xyz$/,
-        /\.ngrok-free\.app$/,
-        /\.firebaseapp\.com$/,
-        /\.web\.app$/,
-      ];
-
-      if (
-        allowedOrigins.includes(origin) ||
-        allowedPatterns.some((pattern) => pattern.test(origin))
-      ) {
-        callback(null, true);
-      } else {
-        console.warn(`⛔ Bloqueado por CORS: ${origin}`);
-        callback(new Error('No autorizado por CORS'));
-      }
-    },
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-    credentials: true,
+  express.json({
+    limit: '100kb',
   })
 );
 
-// =======================
-// MIDDLEWARES
-// =======================
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
 
-// =======================
-// ENDPOINT RAÍZ
-// =======================
-app.get('/', (req, res) => {
-  res.send(`
-    <main style="font-family: system-ui, sans-serif; padding: 40px; color: #1a1a1a; line-height: 1.6;">
-      <h2 style="margin-bottom: 8px;">Servidor Oracle API activo</h2>
-      <p>
-        Instancia desplegada en Oracle Cloud (VM Ubuntu 22.04) con conexión directa
-        a base de datos Oracle PL/SQL.
-      </p>
+/* ============================================================
+   CORS
+   ============================================================ */
 
-      <h3 style="margin-top: 25px;">Endpoints disponibles</h3>
-      <ul>
-        <li><code>GET /api/generar-informe/:anio</code> — Ejecuta procedimiento PL/SQL y genera informe anual</li>
-        <li><code>GET /api/porcentaje-vendedor</code> — Consulta tabla de porcentajes por vendedor</li>
-        <li><code>GET /api/errores</code> — Lista errores registrados en la bitácora</li>
-        <li><code>GET /api/vendedores</code> — Obtiene listado de vendedores</li>
-        <li><code>PUT /api/vendedor/:rut/sueldo</code> — Actualiza sueldo base del vendedor</li>
-        <li><code>GET /api/clientes</code> — Lista clientes activos</li>
-        <li><code>GET /api/boletas</code> — Consulta boletas (últimas 100)</li>
-        <li><code>GET /api/facturas</code> — Consulta facturas (últimas 100)</li>
-        <li><code>GET /api/productos</code> — Lista productos disponibles</li>
-        <li><code>GET /api/bitacora</code> — Muestra registros de bitácora de cambios</li>
-      </ul>
+function getAllowedOrigins() {
+  return String(process.env.CORS_ORIGINS ?? '')
+    .split(',')
+    .map((origin) => origin.trim())
+    .filter(Boolean);
+}
 
-      <p style="margin-top: 25px; font-size: 0.9em; color: #555;">
-        © ${new Date().getFullYear()} Gestión de Ventas – Oracle Cloud
-      </p>
-    </main>
-  `);
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+  const allowedOrigins = getAllowedOrigins();
+
+  /*
+   * Requests como curl, healthchecks o tráfico server-to-server
+   * normalmente no incluyen Origin.
+   */
+  if (!origin) {
+    return next();
+  }
+
+  /*
+   * En desarrollo, si no se configuraron orígenes,
+   * permitimos localhost para facilitar trabajo local.
+   */
+  const developmentFallback =
+    process.env.NODE_ENV !== 'production' &&
+    allowedOrigins.length === 0 &&
+    (
+      origin.startsWith('http://localhost:') ||
+      origin.startsWith('http://127.0.0.1:')
+    );
+
+  const allowed =
+    allowedOrigins.includes(origin) ||
+    developmentFallback;
+
+  if (!allowed) {
+    return res.status(403).json({
+      error: 'Origen no permitido.',
+    });
+  }
+
+  res.setHeader('Access-Control-Allow-Origin', origin);
+  res.setHeader('Vary', 'Origin');
+
+  res.setHeader(
+    'Access-Control-Allow-Methods',
+    'GET,POST,PUT,OPTIONS'
+  );
+
+  res.setHeader(
+    'Access-Control-Allow-Headers',
+    'Content-Type,X-Admin-Key'
+  );
+
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(204);
+  }
+
+  next();
 });
 
-// =======================
-// ROUTES
-// =======================
-app.use('/api', oracleRouter);
+
+/* ============================================================
+   ROOT
+   ============================================================ */
+
+app.get('/', (req, res) => {
+  res.json({
+    name: 'Gestión Comercial Oracle API',
+    status: 'online',
+
+    environment:
+      process.env.NODE_ENV ?? 'development',
+
+    demoReadOnly:
+      process.env.DEMO_READ_ONLY !== 'false',
+
+    endpoints: {
+      health: '/health',
+
+      dashboard: '/api/dashboard',
+
+      ventas: '/api/ventas',
+      boleta: '/api/ventas/boleta/:numero',
+      factura: '/api/ventas/factura/:numero',
+
+      vendedores: '/api/vendedores',
+      vendedor: '/api/vendedores/:rut',
+
+      clientes: '/api/clientes',
+      cliente: '/api/clientes/:rut',
+
+      productos: '/api/productos',
+      producto: '/api/productos/:codigo',
+
+      reportes: '/api/reportes',
+      generarReporte: 'POST /api/reportes/:anio/generar',
+
+      bitacora: '/api/bitacora',
+      errores: '/api/errores',
+    },
+  });
+});
+
+
+/* ============================================================
+   HEALTH CHECK
+   ============================================================ */
+
+app.get('/health', async (req, res) => {
+  let conn;
+
+  try {
+    conn = await getConnection();
+
+    await conn.execute(`
+      SELECT 1 AS ok
+      FROM dual
+    `);
+
+    res.json({
+      status: 'ok',
+      database: 'connected',
+    });
+  } catch (err) {
+    console.error('Health check Oracle falló:', err);
+
+    res.status(503).json({
+      status: 'error',
+      database: 'unavailable',
+    });
+  } finally {
+    if (conn) {
+      try {
+        await conn.close();
+      } catch (err) {
+        console.error(
+          'Error cerrando conexión del health check:',
+          err
+        );
+      }
+    }
+  }
+});
+
+
+/* ============================================================
+   API
+   ============================================================ */
+
+app.use('/api', oracleRoutes);
+
+
+/* ============================================================
+   404
+   ============================================================ */
+
+app.use((req, res) => {
+  res.status(404).json({
+    error: 'Ruta no encontrada.',
+  });
+});
+
+
+/* ============================================================
+   ERROR HANDLER GLOBAL
+   ============================================================ */
+
+app.use((err, req, res, next) => {
+  console.error('Error no controlado:', err);
+
+  if (res.headersSent) {
+    return next(err);
+  }
+
+  res.status(500).json({
+    error: 'Ocurrió un error interno en el servidor.',
+  });
+});
+
 
 export default app;
-

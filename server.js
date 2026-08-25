@@ -1,30 +1,47 @@
+import 'dotenv/config';
 import app from './app.js';
-import dotenv from 'dotenv';
 
-dotenv.config();
+const PORT = Number(process.env.PORT) || 4000;
 
-const PORT = process.env.PORT || 4000;
+const server = app.listen(
+  PORT,
+  '0.0.0.0',
+  () => {
+    console.log('');
+    console.log('==========================================');
+    console.log(' Gestión Comercial Oracle API');
+    console.log('==========================================');
+    console.log(`Puerto: ${PORT}`);
+    console.log(
+      `Entorno: ${process.env.NODE_ENV ?? 'development'}`
+    );
+    console.log(
+      `Demo read-only: ${
+        process.env.DEMO_READ_ONLY !== 'false'
+      }`
+    );
+    console.log('==========================================');
+    console.log('');
+  }
+);
 
-// Endpoint raíz informativo
-app.get('/', (req, res) => {
-  res.send(`
-    <main style="font-family: system-ui; color: #222; padding: 40px; line-height: 1.6;">
-      <h2 style="margin-bottom: 10px;">Servidor Oracle API activo</h2>
-      <p>Instancia en ejecución dentro de Oracle Cloud (VM Ubuntu 22.04).</p>
-      <p>Conectado a base de datos Oracle PL/SQL.</p>
-      <p>Rutas disponibles:</p>
-      <ul>
-        <li><code>GET /api/vendedores</code></li>
-        <li><code>GET /api/ventas</code></li>
-        <li><code>GET /api/errores</code></li>
-      </ul>
-      <p style="margin-top: 25px; font-size: 0.9em; color: #666;">© ${new Date().getFullYear()} Gestión de Ventas – Oracle Cloud</p>
-    </main>
-  `);
-});
 
-// Escuchar en todas las interfaces de red
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`Servidor en ejecución en http://0.0.0.0:${PORT}`);
-});
+function shutdown(signal) {
+  console.log(`${signal} recibido. Cerrando servidor...`);
 
+  server.close(() => {
+    console.log('Servidor HTTP cerrado.');
+    process.exit(0);
+  });
+
+  setTimeout(() => {
+    console.error(
+      'Cierre forzado después del timeout.'
+    );
+
+    process.exit(1);
+  }, 10_000).unref();
+}
+
+process.on('SIGTERM', () => shutdown('SIGTERM'));
+process.on('SIGINT', () => shutdown('SIGINT'));
