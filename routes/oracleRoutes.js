@@ -38,7 +38,7 @@ router.get('/generar-informe/:anio', async (req, res) => {
   }
 });
 
-// para onsultar resultados del informe
+// Consultar resultados del informe
 router.get('/porcentaje-vendedor', async (req, res) => {
   let conn;
   try {
@@ -69,7 +69,11 @@ router.get('/errores', async (req, res) => {
 });
 
 
-//  Listar todos los vendedores
+/* ============================================================
+   NUEVAS RUTAS AGREGADAS
+   ============================================================ */
+
+// 1️⃣ Listar todos los vendedores
 router.get('/vendedores', async (req, res) => {
   let conn;
   try {
@@ -88,7 +92,7 @@ router.get('/vendedores', async (req, res) => {
   }
 });
 
-// Listar clientes activos
+// 2️⃣ Listar clientes activos
 router.get('/clientes', async (req, res) => {
   let conn;
   try {
@@ -108,7 +112,7 @@ router.get('/clientes', async (req, res) => {
   }
 });
 
-//  Consultar boletas (últimas 100)
+// 3️⃣ Consultar boletas (últimas 100)
 router.get('/boletas', async (req, res) => {
   let conn;
   try {
@@ -127,7 +131,7 @@ router.get('/boletas', async (req, res) => {
   }
 });
 
-//  Consultar facturas (últimas 100)
+// 4️⃣ Consultar facturas (últimas 100)
 router.get('/facturas', async (req, res) => {
   let conn;
   try {
@@ -146,7 +150,7 @@ router.get('/facturas', async (req, res) => {
   }
 });
 
-// Listar productos disponibles
+// 5️⃣ Listar productos disponibles
 router.get('/productos', async (req, res) => {
   let conn;
   try {
@@ -217,4 +221,6 @@ router.put('/vendedor/:rut/sueldo', async (req, res) => {
 
 
 
+
 export default router;
+

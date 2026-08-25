@@ -21,10 +21,10 @@ export async function getConnection() {
       walletPassword: process.env.DB_WALLET_PASSWORD
     });
 
-    console.log("Conexión establecida correctamente");
+    console.log("✅ Conexión establecida correctamente");
     return connection;
   } catch (err) {
-    console.error("Error al conectar con Oracle:", err);
+    console.error("❌ Error al conectar con Oracle:", err);
     throw err;
   }
 }
