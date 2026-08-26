@@ -47,11 +47,22 @@ jobs:
         run: |
           mkdir -p ~/.ssh
           chmod 700 ~/.ssh
-          printf '%s' "$SSH_PRIVATE_KEY_B64" | base64 --decode > ~/.ssh/oracle.key
+
+          printf '%s' "$SSH_PRIVATE_KEY_B64" \
+            | base64 --decode \
+            > ~/.ssh/oracle.key
+
           chmod 600 ~/.ssh/oracle.key
-          ssh-keygen -y -f ~/.ssh/oracle.key > /dev/null
+
+          ssh-keygen -y \
+            -f ~/.ssh/oracle.key \
+            > /dev/null
+
           echo "SSH private key loaded successfully"
-          ssh-keyscan -H "$ORACLE_HOST" >> ~/.ssh/known_hosts
+
+          ssh-keyscan -H "$ORACLE_HOST" \
+            >> ~/.ssh/known_hosts
+
           chmod 600 ~/.ssh/known_hosts
 
       - name: Upload deployment
@@ -72,4 +83,7 @@ jobs:
           ssh \
             -i ~/.ssh/oracle.key \
             "$ORACLE_USER@$ORACLE_HOST" \
-            "deploy-oracle-api"
+            "export NODE_ENV='production'; \
+             export DEMO_READ_ONLY='true'; \
+             export CORS_ORIGINS='https://oracle.tramasys.cl,http://localhost:3000,http://localhost:3001,https://ventasgestion331.web.app,https://ventasgestion331.firebaseapp.com'; \
+             deploy-oracle-api"
